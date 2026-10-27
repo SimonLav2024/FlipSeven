@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="img/icons8-7-clave-96.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Flip 7 Seven</title>
+</head>
+<body>
+
+    <header>
+        <h1>Flip Seven – Contador de puntos</h1>
+        <p class="subtitulo">El primero en llegar a 200 puntos gana la partida</p>
+    </header>
+
+    <main>
+        <!-- Paso 1: dar de alta a los jugadores -->
+        <section id="seccion-jugadores" class="tarjeta">
+            <h2>1. Añade los jugadores</h2>
+            <form id="form-jugador" autocomplete="off">
+                <label for="input-nombre">Nombre o apodo</label>
+                <div class="fila-formulario">
+                    <input type="text" id="input-nombre" name="nombre" placeholder="Ej. Simón" maxlength="20" required>
+                    <button type="submit">Añadir jugador</button>
+                </div>
+            </form>
+
+            <ul id="lista-jugadores" class="lista-jugadores"></ul>
+
+            <button id="btn-empezar" type="button" disabled>Empezar partida</button>
+            <p id="mensaje-jugadores" class="mensaje"></p>
+        </section>
+
+        <!-- Paso 2: jugar rondas, uno a uno -->
+        <section id="seccion-partida" class="tarjeta oculto">
+            <h2>2. Partida en curso</h2>
+
+            <div class="turno-actual">
+                <p>Turno de:</p>
+                <p id="nombre-turno" class="nombre-turno"></p>
+            </div>
+
+            <form id="form-numero" autocomplete="off">
+                <label for="input-numero">Número sacado (0 a 12, máximo 7 por ronda, sin repetir)</label>
+                <input type="number" id="input-numero" class="input-numero-solo" name="numero" placeholder="Ej. 12" min="0" max="12" required>
+                <div class="teclado-numerico">
+                    <button type="button" class="btn-tecla" data-digito="7">7</button>
+                    <button type="button" class="btn-tecla" data-digito="8">8</button>
+                    <button type="button" class="btn-tecla" data-digito="9">9</button>
+                    <button type="button" class="btn-tecla" data-digito="4">4</button>
+                    <button type="button" class="btn-tecla" data-digito="5">5</button>
+                    <button type="button" class="btn-tecla" data-digito="6">6</button>
+                    <button type="button" class="btn-tecla" data-digito="1">1</button>
+                    <button type="button" class="btn-tecla" data-digito="2">2</button>
+                    <button type="button" class="btn-tecla" data-digito="3">3</button>
+                    <button type="button" id="btn-borrar-digito" class="btn-tecla btn-tecla-accion">⌫</button>
+                    <button type="button" class="btn-tecla" data-digito="0">0</button>
+                    <button type="button" id="btn-limpiar-digitos" class="btn-tecla btn-tecla-accion">C</button>
+                </div>
+                <button type="submit" class="btn-sacar-numero">Sacar número</button>
+            </form>
+            <p id="mensaje-ronda" class="mensaje"></p>
+
+            <ul id="lista-numeros-ronda" class="lista-numeros-ronda"></ul>
+            <p class="subtotal-numeros">Suma de números: <strong id="valor-subtotal-numeros">0</strong></p>
+
+            <h3>Cartas comodín <span class="nota-comodin">(no cuentan para los 7 números)</span></h3>
+            <div class="comodines-botones">
+                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="2">+2</button>
+                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="4">+4</button>
+                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="6">+6</button>
+                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="8">+8</button>
+                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="10">+10</button>
+                <button type="button" class="btn-comodin" data-tipo="multiplicador" data-valor="2">x2</button>
+            </div>
+            <ul id="lista-comodines-ronda" class="lista-numeros-ronda lista-comodines"></ul>
+
+            <p class="subtotal-ronda">Total de la ronda: <strong id="valor-subtotal">0</strong></p>
+
+            <button id="btn-plantarse" type="button" disabled>Plantarme y guardar ronda</button>
+            <button id="btn-repetido" type="button" class="btn-repetido">❌ Número repetido (pierdo la ronda)</button>
+
+            <h3>Carta de Bloqueo <span class="nota-comodin">(el jugador bloqueado se salta su turno hasta que se le desbloquee)</span></h3>
+            <div id="botones-bloqueo" class="comodines-botones"></div>
+
+            <h3>Marcador</h3>
+            <table id="tabla-marcador" class="tabla-marcador">
+                <thead>
+                    <tr>
+                        <th>Jugador</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-marcador"></tbody>
+            </table>
+
+            <button id="btn-reiniciar" type="button" class="btn-secundario">Reiniciar partida</button>
+        </section>
+
+        <!-- Paso 3: ganador -->
+        <section id="seccion-ganador" class="tarjeta oculto">
+            <h2>🏆 ¡Tenemos ganador!</h2>
+            <p id="mensaje-ganador" class="mensaje-ganador"></p>
+            <button id="btn-nueva-partida" type="button">Nueva partida</button>
+        </section>
+    </main>
+
+    <!-- Popup de celebración al completar los 7 números -->
+    <div id="modal-flip-seven" class="modal oculto">
+        <div class="modal-contenido">
+            <h2>🎉 ¡Felicidades, has hecho un Flip Seven!</h2>
+            <p id="mensaje-flip-seven"></p>
+            <button id="btn-cerrar-flip-seven" type="button">Continuar</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Flip 7 Seven</p>
+        <p>Todos los derechos reservados.</p>
+        <p>Favicon <a target="_blank" href="https://icons8.com/icon/DorLgnWgwwF1/7-key">7 clave</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

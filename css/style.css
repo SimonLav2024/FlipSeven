@@ -1,0 +1,397 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(160deg, #1b1230, #3a0d0d 70%);
+    color: #f5f0ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+}
+
+.subtitulo {
+    margin: 0;
+    color: #d8c7ff;
+    font-size: 0.95rem;
+}
+
+main {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tarjeta {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.tarjeta h2 {
+    margin-top: 0;
+}
+
+.oculto {
+    display: none;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #d8c7ff;
+}
+
+.fila-formulario {
+    display: flex;
+    gap: 8px;
+}
+
+input[type="text"],
+input[type="number"] {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff;
+    font-size: 1rem;
+}
+
+input::placeholder {
+    color: #b9a8dd;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background: #e63946;
+    color: #fff;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secundario {
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.btn-repetido {
+    width: 100%;
+    margin-top: 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 159, 67, 0.7);
+    color: #ff9f43;
+}
+
+.btn-repetido:hover:not(:disabled) {
+    background: rgba(255, 159, 67, 0.15);
+}
+
+#btn-empezar {
+    margin-top: 16px;
+    width: 100%;
+}
+
+.lista-jugadores {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lista-jugadores li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.lista-jugadores button {
+    background: transparent;
+    color: #ff8a8a;
+    padding: 2px 8px;
+    font-size: 0.85rem;
+}
+
+.mensaje {
+    min-height: 1.2em;
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    color: #ffb4b4;
+}
+
+.turno-actual {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.turno-actual p:first-child {
+    margin: 0;
+    color: #d8c7ff;
+    font-size: 0.9rem;
+}
+
+.nombre-turno {
+    margin: 4px 0 0 !important;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ffd166;
+}
+
+.lista-numeros-ronda {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.lista-numeros-ronda li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.lista-numeros-ronda button {
+    background: transparent;
+    color: #ff8a8a;
+    padding: 0 4px;
+    font-size: 0.85rem;
+}
+
+.teclado-numerico {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.input-numero-solo {
+    width: 100%;
+}
+
+.btn-sacar-numero {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.btn-tecla {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 0;
+    font-size: 1.1rem;
+    border-radius: 8px;
+}
+
+.btn-tecla:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.btn-tecla-accion {
+    background: rgba(230, 57, 70, 0.3);
+    font-size: 1rem;
+}
+
+.btn-tecla-accion:hover {
+    background: rgba(230, 57, 70, 0.5);
+}
+
+.subtotal-numeros {
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    color: #d8c7ff;
+}
+
+.subtotal-numeros strong {
+    color: #ffd166;
+}
+
+.nota-comodin {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #b9a8dd;
+}
+
+.comodines-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.btn-comodin {
+    background: #6a3fb5;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+}
+
+.btn-comodin:hover {
+    background: #7c4fd0;
+}
+
+.lista-comodines li {
+    background: rgba(106, 63, 181, 0.35);
+    border: 1px solid rgba(124, 79, 208, 0.6);
+}
+
+.btn-bloqueo {
+    background: #1d6fa5;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+}
+
+.btn-bloqueo:hover:not(:disabled) {
+    background: #2688c4;
+}
+
+.btn-desbloqueo {
+    background: #2a9d57;
+}
+
+.btn-desbloqueo:hover:not(:disabled) {
+    background: #34bd69;
+}
+
+.etiqueta-bloqueado {
+    color: #7ecbff;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.subtotal-ronda {
+    margin: 12px 0 0;
+    font-size: 0.95rem;
+    color: #d8c7ff;
+}
+
+.subtotal-ronda strong {
+    color: #ffd166;
+}
+
+#btn-plantarse {
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+.tabla-marcador {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.tabla-marcador th,
+.tabla-marcador td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tabla-marcador tr.fila-ganando td {
+    color: #ffd166;
+    font-weight: 700;
+}
+
+.mensaje-ganador {
+    font-size: 1.3rem;
+    text-align: center;
+    font-weight: 700;
+    color: #ffd166;
+}
+
+footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #b9a8dd;
+}
+
+footer a {
+    color: #d8c7ff;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 1000;
+}
+
+.modal.oculto {
+    display: none;
+}
+
+.modal-contenido {
+    background: linear-gradient(160deg, #3a0d0d, #1b1230 80%);
+    border: 1px solid rgba(255, 209, 102, 0.6);
+    border-radius: 14px;
+    padding: 28px 24px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-contenido h2 {
+    margin-top: 0;
+    color: #ffd166;
+    font-size: 1.4rem;
+}
+
+.modal-contenido p {
+    margin: 12px 0 20px;
+    color: #f5f0ff;
+    font-size: 1rem;
+}
+
+.modal-contenido button {
+    width: 100%;
+}
