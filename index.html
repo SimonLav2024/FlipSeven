@@ -10,18 +10,19 @@
 <body>
 
     <header>
-        <h1>Flip Seven – Contador de puntos</h1>
-        <p class="subtitulo">El primero en llegar a 200 puntos gana la partida</p>
+        <h1><b>Flip 7 Seven</b></h1>
+        <h1>Contador de puntos</h1>
+        <p class="subtitulo">El primero en llegar a 200 puntos gana</p>
     </header>
 
     <main>
         <!-- Paso 1: dar de alta a los jugadores -->
         <section id="seccion-jugadores" class="tarjeta">
-            <h2>1. Añade los jugadores</h2>
+            <h2>Añade los jugadores</h2>
             <form id="form-jugador" autocomplete="off">
                 <label for="input-nombre">Nombre o apodo</label>
                 <div class="fila-formulario">
-                    <input type="text" id="input-nombre" name="nombre" placeholder="Ej. Simón" maxlength="20" required>
+                    <input type="text" id="input-nombre" name="nombre" placeholder="apuntate aquí" maxlength="20" required>
                     <button type="submit">Añadir jugador</button>
                 </div>
             </form>
@@ -34,7 +35,7 @@
 
         <!-- Paso 2: jugar rondas, uno a uno -->
         <section id="seccion-partida" class="tarjeta oculto">
-            <h2>2. Partida en curso</h2>
+            <h2>Partida en curso</h2>
 
             <div class="turno-actual">
                 <p>Turno de:</p>
@@ -42,7 +43,7 @@
             </div>
 
             <form id="form-numero" autocomplete="off">
-                <label for="input-numero">Número sacado (0 a 12, máximo 7 por ronda, sin repetir)</label>
+                <label for="input-numero">Número sacado</label>
                 <input type="number" id="input-numero" class="input-numero-solo" name="numero" placeholder="Ej. 12" min="0" max="12" required>
                 <div class="teclado-numerico">
                     <button type="button" class="btn-tecla" data-digito="7">7</button>
@@ -63,7 +64,7 @@
             <p id="mensaje-ronda" class="mensaje"></p>
 
             <ul id="lista-numeros-ronda" class="lista-numeros-ronda"></ul>
-            <p class="subtotal-numeros">Suma de números: <strong id="valor-subtotal-numeros">0</strong></p>
+            <p class="subtotal-numeros">Suma de puntos: <strong id="valor-subtotal-numeros">0</strong></p>
 
             <h3>Cartas comodín <span class="nota-comodin">(no cuentan para los 7 números)</span></h3>
             <div class="comodines-botones">
@@ -78,8 +79,8 @@
 
             <p class="subtotal-ronda">Total de la ronda: <strong id="valor-subtotal">0</strong></p>
 
-            <button id="btn-plantarse" type="button" disabled>Plantarme y guardar ronda</button>
-            <button id="btn-repetido" type="button" class="btn-repetido">❌ Número repetido (pierdo la ronda)</button>
+            <button id="btn-plantarse" type="button" disabled>Me planto</button>
+            <button id="btn-repetido" type="button" class="btn-repetido">❌ Número repetido</button>
 
             <h3>Carta de Bloqueo <span class="nota-comodin">(el jugador bloqueado se salta su turno hasta que se le desbloquee)</span></h3>
             <div id="botones-bloqueo" class="comodines-botones"></div>
@@ -116,8 +117,8 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 Flip 7 Seven</p>
-        <p>Todos los derechos reservados.</p>
+        <p>&copy; 2026 Flip 7 Seven. Todos los derechos reservados.</p>
+        <p>v1.0</p>
         <p>Favicon <a target="_blank" href="https://icons8.com/icon/DorLgnWgwwF1/7-key">7 clave</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
     </footer>
 

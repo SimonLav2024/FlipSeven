@@ -163,6 +163,16 @@
         btnLimpiarDigitos.disabled = !habilitada;
     }
 
+    function readonly() {
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            inputNumero.readOnly = true;
+        } else {
+            inputNumero.readOnly = false;
+        }
+    }
+    readonly();
+    window.addEventListener('resize', readonly); // Actualiza el estado de readonly al cambiar el tamaño de la ventana
+
     function calcularTotalesRonda() {
         const sumaNumeros = numerosRonda.reduce((suma, numero) => suma + numero, 0);
         const bonusPlano = comodinesRonda
