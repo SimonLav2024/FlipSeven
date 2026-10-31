@@ -5,11 +5,18 @@
     const MIN_NUMERO = 0;
     const MAX_NUMERO = 12;
 
-    // Estado de la partida
-    let jugadores = []; // { nombre, total }
-    let turnoActual = 0;
-    let numerosRonda = []; // números sacados en la ronda actual del jugador en turno
-    let comodinesRonda = []; // cartas comodín de la ronda actual: { etiqueta, tipo: 'bonus'|'multiplicador', valor }
+    const COMODINES = [
+        { etiqueta: '+2', tipo: 'bonus', valor: 2 },
+        { etiqueta: '+4', tipo: 'bonus', valor: 4 },
+        { etiqueta: '+6', tipo: 'bonus', valor: 6 },
+        { etiqueta: '+8', tipo: 'bonus', valor: 8 },
+        { etiqueta: '+10', tipo: 'bonus', valor: 10 },
+        { etiqueta: 'x2', tipo: 'multiplicador', valor: 2 }
+    ];
+
+    // Estado: cada jugador lleva su propia ronda en paralelo
+    // { nombre, total, numeros: [], comodines: [], mensaje: '', panel: HTMLElement }
+    let jugadores = [];
 
     // Referencias al DOM
     const seccionJugadores = document.getElementById('seccion-jugadores');
@@ -22,21 +29,7 @@
     const btnEmpezar = document.getElementById('btn-empezar');
     const mensajeJugadores = document.getElementById('mensaje-jugadores');
 
-    const nombreTurno = document.getElementById('nombre-turno');
-    const formNumero = document.getElementById('form-numero');
-    const inputNumero = document.getElementById('input-numero');
-    const mensajeRonda = document.getElementById('mensaje-ronda');
-    const listaNumerosRonda = document.getElementById('lista-numeros-ronda');
-    const valorSubtotalNumeros = document.getElementById('valor-subtotal-numeros');
-    const botonesTecla = document.querySelectorAll('.btn-tecla[data-digito]');
-    const btnBorrarDigito = document.getElementById('btn-borrar-digito');
-    const btnLimpiarDigitos = document.getElementById('btn-limpiar-digitos');
-    const botonesComodin = document.querySelectorAll('.btn-comodin');
-    const listaComodinesRonda = document.getElementById('lista-comodines-ronda');
-    const valorSubtotal = document.getElementById('valor-subtotal');
-    const btnPlantarse = document.getElementById('btn-plantarse');
-    const btnRepetido = document.getElementById('btn-repetido');
-    const contenedorBotonesBloqueo = document.getElementById('botones-bloqueo');
+    const contenedorPaneles = document.getElementById('contenedor-paneles');
     const cuerpoMarcador = document.getElementById('cuerpo-marcador');
     const btnReiniciar = document.getElementById('btn-reiniciar');
 
@@ -46,6 +39,8 @@
     const modalFlipSeven = document.getElementById('modal-flip-seven');
     const mensajeFlipSeven = document.getElementById('mensaje-flip-seven');
     const btnCerrarFlipSeven = document.getElementById('btn-cerrar-flip-seven');
+
+    /* ---------- Alta de jugadores ---------- */
 
     function renderListaJugadores() {
         listaJugadores.innerHTML = '';
@@ -82,13 +77,13 @@
             return;
         }
 
-        const existe = jugadores.some((jugador) => jugador.nombre.toLowerCase() === nombre.toLowerCase());
+        const existe = jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase());
         if (existe) {
             mensajeJugadores.textContent = 'Ese nombre ya está en la lista.';
             return;
         }
 
-        jugadores.push({ nombre, total: 0, bloqueado: false });
+        jugadores.push({ nombre, total: 0, numeros: [], comodines: [], mensaje: '', panel: null });
         inputNombre.value = '';
         inputNombre.focus();
         renderListaJugadores();
@@ -98,150 +93,159 @@
         if (jugadores.length < 2) {
             return;
         }
-        turnoActual = 0;
         seccionJugadores.classList.add('oculto');
         seccionPartida.classList.remove('oculto');
-        actualizarTurno();
+
+        contenedorPaneles.innerHTML = '';
+        jugadores.forEach((jugador) => {
+            const panel = document.createElement('article');
+            panel.className = 'tarjeta panel-jugador';
+            jugador.panel = panel;
+            contenedorPaneles.appendChild(panel);
+            renderPanel(jugador);
+        });
         renderMarcador();
     });
 
-    function actualizarTurno() {
-        const jugador = jugadores[turnoActual];
-        nombreTurno.textContent = jugador.nombre;
-        numerosRonda = [];
-        comodinesRonda = [];
-        mensajeRonda.textContent = '';
-        renderNumerosRonda();
-        renderComodinesRonda();
-        renderBotonesBloqueo();
-        habilitarEntradaNumero(true);
-        inputNumero.value = '';
-        inputNumero.focus();
-    }
+    /* ---------- Cálculos ---------- */
 
-    function renderBotonesBloqueo() {
-        contenedorBotonesBloqueo.innerHTML = '';
-        jugadores.forEach((jugador, indice) => {
-            if (indice === turnoActual) {
-                return;
-            }
-
-            const boton = document.createElement('button');
-            boton.type = 'button';
-
-            if (jugador.bloqueado) {
-                boton.className = 'btn-bloqueo btn-desbloqueo';
-                boton.textContent = `Desbloquear a ${jugador.nombre}`;
-                boton.addEventListener('click', () => {
-                    jugador.bloqueado = false;
-                    mensajeRonda.textContent = `${jugador.nombre} ha sido desbloqueado y podrá jugar en su próximo turno.`;
-                    renderBotonesBloqueo();
-                    renderMarcador();
-                });
-            } else {
-                boton.className = 'btn-bloqueo';
-                boton.textContent = `Bloquear a ${jugador.nombre}`;
-                boton.addEventListener('click', () => {
-                    jugador.bloqueado = true;
-                    mensajeRonda.textContent = `${jugador.nombre} ha sido bloqueado: se saltará su turno hasta que se le desbloquee.`;
-                    renderBotonesBloqueo();
-                    renderMarcador();
-                });
-            }
-
-            contenedorBotonesBloqueo.appendChild(boton);
-        });
-    }
-
-    function habilitarEntradaNumero(habilitada) {
-        inputNumero.disabled = !habilitada;
-        formNumero.querySelector('button[type="submit"]').disabled = !habilitada;
-        botonesTecla.forEach((boton) => {
-            boton.disabled = !habilitada;
-        });
-        btnBorrarDigito.disabled = !habilitada;
-        btnLimpiarDigitos.disabled = !habilitada;
-    }
-
-    function readonly() {
-        if (window.matchMedia('(max-width: 768px)').matches) {
-            inputNumero.readOnly = true;
-        } else {
-            inputNumero.readOnly = false;
-        }
-    }
-    readonly();
-    window.addEventListener('resize', readonly); // Actualiza el estado de readonly al cambiar el tamaño de la ventana
-
-    function calcularTotalesRonda() {
-        const sumaNumeros = numerosRonda.reduce((suma, numero) => suma + numero, 0);
-        const bonusPlano = comodinesRonda
-            .filter((carta) => carta.tipo === 'bonus')
-            .reduce((suma, carta) => suma + carta.valor, 0);
-        const multiplicador = comodinesRonda
-            .filter((carta) => carta.tipo === 'multiplicador')
-            .reduce((producto, carta) => producto * carta.valor, 1);
+    function calcularTotalesRonda(jugador) {
+        const sumaNumeros = jugador.numeros.reduce((suma, n) => suma + n, 0);
+        const bonusPlano = jugador.comodines
+            .filter((c) => c.tipo === 'bonus')
+            .reduce((suma, c) => suma + c.valor, 0);
+        const multiplicador = jugador.comodines
+            .filter((c) => c.tipo === 'multiplicador')
+            .reduce((producto, c) => producto * c.valor, 1);
         const total = sumaNumeros * multiplicador + bonusPlano;
         return { sumaNumeros, bonusPlano, multiplicador, total };
     }
 
-    function actualizarTotalesRonda() {
-        const { sumaNumeros, total } = calcularTotalesRonda();
-        valorSubtotalNumeros.textContent = sumaNumeros;
-        valorSubtotal.textContent = total;
-        btnPlantarse.disabled = numerosRonda.length === 0 && comodinesRonda.length === 0;
+    function crearBoton(texto, clase, onClick) {
+        const boton = document.createElement('button');
+        boton.type = 'button';
+        if (clase) {
+            boton.className = clase;
+        }
+        boton.textContent = texto;
+        boton.addEventListener('click', onClick);
+        return boton;
     }
 
-    function renderNumerosRonda() {
-        listaNumerosRonda.innerHTML = '';
-        numerosRonda.forEach((numero, indice) => {
+    function crearListaQuitable(elementos, etiqueta, onQuitar) {
+        const ul = document.createElement('ul');
+        ul.className = 'lista-numeros-ronda';
+        elementos.forEach((elemento, indice) => {
             const li = document.createElement('li');
-
             const valor = document.createElement('span');
-            valor.textContent = numero;
-
-            const btnQuitar = document.createElement('button');
-            btnQuitar.type = 'button';
-            btnQuitar.textContent = '✕';
-            btnQuitar.title = 'Quitar este número';
-            btnQuitar.addEventListener('click', () => {
-                numerosRonda.splice(indice, 1);
-                mensajeRonda.textContent = '';
-                renderNumerosRonda();
-                habilitarEntradaNumero(true);
-            });
-
+            valor.textContent = etiqueta(elemento);
+            const btnQuitar = crearBoton('✕', '', () => onQuitar(indice));
+            btnQuitar.title = 'Quitar';
             li.appendChild(valor);
             li.appendChild(btnQuitar);
-            listaNumerosRonda.appendChild(li);
+            ul.appendChild(li);
         });
-
-        actualizarTotalesRonda();
+        return ul;
     }
 
-    function renderComodinesRonda() {
-        listaComodinesRonda.innerHTML = '';
-        comodinesRonda.forEach((carta, indice) => {
-            const li = document.createElement('li');
+    /* ---------- Panel de cada jugador ---------- */
 
-            const valor = document.createElement('span');
-            valor.textContent = carta.etiqueta;
+    function renderPanel(jugador) {
+        const panel = jugador.panel;
+        panel.innerHTML = '';
 
-            const btnQuitar = document.createElement('button');
-            btnQuitar.type = 'button';
-            btnQuitar.textContent = '✕';
-            btnQuitar.title = 'Quitar esta carta';
-            btnQuitar.addEventListener('click', () => {
-                comodinesRonda.splice(indice, 1);
-                renderComodinesRonda();
+        const { sumaNumeros, total } = calcularTotalesRonda(jugador);
+        const completo = jugador.numeros.length >= MAX_NUMEROS_RONDA;
+
+        // Cabecera
+        const cabecera = document.createElement('div');
+        cabecera.className = 'panel-cabecera';
+        const nombre = document.createElement('h3');
+        nombre.className = 'panel-nombre';
+        nombre.textContent = jugador.nombre;
+        const totalPartida = document.createElement('span');
+        totalPartida.className = 'panel-total';
+        totalPartida.textContent = `${jugador.total} pts`;
+        cabecera.appendChild(nombre);
+        cabecera.appendChild(totalPartida);
+        panel.appendChild(cabecera);
+
+        // Números
+        const etiquetaNumeros = document.createElement('p');
+        etiquetaNumeros.className = 'panel-etiqueta';
+        etiquetaNumeros.textContent = `Números (${jugador.numeros.length}/${MAX_NUMEROS_RONDA})`;
+        panel.appendChild(etiquetaNumeros);
+
+        const teclado = document.createElement('div');
+        teclado.className = 'panel-teclado';
+        for (let n = MIN_NUMERO; n <= MAX_NUMERO; n++) {
+            const yaSacado = jugador.numeros.includes(n);
+            const boton = crearBoton(String(n), 'btn-tecla', () => sacarNumero(jugador, n));
+            boton.disabled = yaSacado || completo;
+            teclado.appendChild(boton);
+        }
+        panel.appendChild(teclado);
+
+        panel.appendChild(crearListaQuitable(
+            jugador.numeros,
+            (n) => n,
+            (indice) => {
+                jugador.numeros.splice(indice, 1);
+                jugador.mensaje = '';
+                renderPanel(jugador);
+            }
+        ));
+
+        const subtotalNumeros = document.createElement('p');
+        subtotalNumeros.className = 'subtotal-numeros';
+        subtotalNumeros.innerHTML = 'Suma de puntos: <strong></strong>';
+        subtotalNumeros.querySelector('strong').textContent = sumaNumeros;
+        panel.appendChild(subtotalNumeros);
+
+        // Comodines
+        const etiquetaComodines = document.createElement('p');
+        etiquetaComodines.className = 'panel-etiqueta';
+        etiquetaComodines.textContent = 'Cartas comodín';
+        panel.appendChild(etiquetaComodines);
+
+        const botonesComodin = document.createElement('div');
+        botonesComodin.className = 'comodines-botones';
+        COMODINES.forEach((carta) => {
+            const boton = crearBoton(carta.etiqueta, 'btn-comodin', () => {
+                jugador.comodines.push({ ...carta });
+                renderPanel(jugador);
             });
-
-            li.appendChild(valor);
-            li.appendChild(btnQuitar);
-            listaComodinesRonda.appendChild(li);
+            botonesComodin.appendChild(boton);
         });
+        panel.appendChild(botonesComodin);
 
-        actualizarTotalesRonda();
+        panel.appendChild(crearListaQuitable(
+            jugador.comodines,
+            (c) => c.etiqueta,
+            (indice) => {
+                jugador.comodines.splice(indice, 1);
+                renderPanel(jugador);
+            }
+        ));
+
+        // Total de la ronda
+        const subtotalRonda = document.createElement('p');
+        subtotalRonda.className = 'subtotal-ronda';
+        subtotalRonda.innerHTML = 'Total de la ronda: <strong></strong>';
+        subtotalRonda.querySelector('strong').textContent = total;
+        panel.appendChild(subtotalRonda);
+
+        // Acciones
+        const sinNada = jugador.numeros.length === 0 && jugador.comodines.length === 0;
+        const btnPlantarse = crearBoton('Me planto', 'btn-plantarse', () => plantarse(jugador));
+        btnPlantarse.disabled = sinNada;
+        panel.appendChild(btnPlantarse);
+
+        // Mensaje
+        const mensaje = document.createElement('p');
+        mensaje.className = 'mensaje';
+        mensaje.textContent = jugador.mensaje;
+        panel.appendChild(mensaje);
     }
 
     function renderMarcador() {
@@ -251,103 +255,49 @@
             if (jugador.total >= META_PUNTOS) {
                 fila.classList.add('fila-ganando');
             }
-
             const celdaNombre = document.createElement('td');
             celdaNombre.textContent = jugador.nombre;
-            if (jugador.bloqueado) {
-                const etiqueta = document.createElement('span');
-                etiqueta.className = 'etiqueta-bloqueado';
-                etiqueta.textContent = ' 🔒 bloqueado';
-                celdaNombre.appendChild(etiqueta);
-            }
-
             const celdaTotal = document.createElement('td');
             celdaTotal.textContent = jugador.total;
-
             fila.appendChild(celdaNombre);
             fila.appendChild(celdaTotal);
             cuerpoMarcador.appendChild(fila);
         });
     }
 
-    botonesTecla.forEach((boton) => {
-        boton.addEventListener('click', () => {
-            inputNumero.value = (inputNumero.value || '') + boton.dataset.digito;
-            inputNumero.focus();
-        });
-    });
+    /* ---------- Acciones ---------- */
 
-    btnBorrarDigito.addEventListener('click', () => {
-        inputNumero.value = inputNumero.value.slice(0, -1);
-        inputNumero.focus();
-    });
+    function sacarNumero(jugador, numero) {
+        if (jugador.numeros.length >= MAX_NUMEROS_RONDA || jugador.numeros.includes(numero)) {
+            return;
+        }
+        jugador.numeros.push(numero);
+        jugador.mensaje = jugador.numeros.length >= MAX_NUMEROS_RONDA
+            ? `Has llegado al máximo de ${MAX_NUMEROS_RONDA} números. Plántate para guardar la ronda.`
+            : '';
+        renderPanel(jugador);
+    }
 
-    btnLimpiarDigitos.addEventListener('click', () => {
-        inputNumero.value = '';
-        inputNumero.focus();
-    });
+    function reiniciarRonda(jugador, mensaje) {
+        jugador.numeros = [];
+        jugador.comodines = [];
+        jugador.mensaje = mensaje || '';
+        renderPanel(jugador);
+    }
 
-    formNumero.addEventListener('submit', (evento) => {
-        evento.preventDefault();
-
-        if (numerosRonda.length >= MAX_NUMEROS_RONDA) {
-            mensajeRonda.textContent = `Ya has sacado ${MAX_NUMEROS_RONDA} números, el máximo por ronda. Plántate para guardar la ronda.`;
+    function plantarse(jugador) {
+        if (jugador.numeros.length === 0 && jugador.comodines.length === 0) {
             return;
         }
 
-        const numero = Number(inputNumero.value);
-        if (Number.isNaN(numero) || inputNumero.value.trim() === '') {
-            mensajeRonda.textContent = 'Introduce un número válido.';
-            return;
-        }
-
-        if (numero < MIN_NUMERO || numero > MAX_NUMERO) {
-            mensajeRonda.textContent = `El número debe estar entre ${MIN_NUMERO} y ${MAX_NUMERO}.`;
-            return;
-        }
-
-        if (numerosRonda.includes(numero)) {
-            mensajeRonda.textContent = `Ya has sacado un ${numero} en esta ronda. No puedes repetir números: usa el botón "Número repetido" si corresponde.`;
-            return;
-        }
-
-        numerosRonda.push(numero);
-        mensajeRonda.textContent = '';
-        renderNumerosRonda();
-
-        if (numerosRonda.length >= MAX_NUMEROS_RONDA) {
-            habilitarEntradaNumero(false);
-            mensajeRonda.textContent = `Has llegado al máximo de ${MAX_NUMEROS_RONDA} números. Plántate para guardar la ronda.`;
-        }
-
-        inputNumero.value = '';
-        inputNumero.focus();
-    });
-
-    botonesComodin.forEach((boton) => {
-        boton.addEventListener('click', () => {
-            const tipo = boton.dataset.tipo;
-            const valor = Number(boton.dataset.valor);
-            const etiqueta = boton.textContent.trim();
-            comodinesRonda.push({ etiqueta, tipo, valor });
-            renderComodinesRonda();
-        });
-    });
-
-    btnPlantarse.addEventListener('click', () => {
-        if (numerosRonda.length === 0 && comodinesRonda.length === 0) {
-            return;
-        }
-
-        const esFlipSeven = numerosRonda.length >= MAX_NUMEROS_RONDA;
-        let totalRonda = calcularTotalesRonda().total;
-
+        const esFlipSeven = jugador.numeros.length >= MAX_NUMEROS_RONDA;
+        let totalRonda = calcularTotalesRonda(jugador).total;
         if (esFlipSeven) {
             totalRonda += BONUS_FLIP_SEVEN;
         }
 
-        const jugador = jugadores[turnoActual];
         jugador.total += totalRonda;
+        reiniciarRonda(jugador, `Ronda guardada: +${totalRonda} puntos.`);
         renderMarcador();
 
         if (esFlipSeven) {
@@ -356,90 +306,32 @@
             return;
         }
 
-        continuarTrasRonda(jugador);
-    });
-
-    btnRepetido.addEventListener('click', () => {
-        const jugador = jugadores[turnoActual];
-        const totalEnJuego = calcularTotalesRonda().total;
-        const confirmado = window.confirm(
-            `¿${jugador.nombre} ha sacado un número repetido? Se perderán los ${totalEnJuego} puntos de esta ronda.`
-        );
-
-        if (!confirmado) {
-            return;
-        }
-
-        continuarTrasRonda(jugador, `${jugador.nombre} ha sacado un número repetido y pierde los puntos de esta ronda.`);
-    });
-
-    function continuarTrasRonda(jugador, mensajePrevio) {
-        if (jugador.total >= META_PUNTOS) {
-            mostrarGanador(jugador);
-            return;
-        }
-
-        const jugadoresSaltados = avanzarTurno();
-        actualizarTurno();
-        renderMarcador();
-
-        const partesMensaje = [];
-        if (mensajePrevio) {
-            partesMensaje.push(mensajePrevio);
-        }
-        if (jugadoresSaltados.length > 0) {
-            const plural = jugadoresSaltados.length > 1;
-            partesMensaje.push(`${jugadoresSaltados.join(', ')} sigue${plural ? 'n' : ''} bloqueado${plural ? 's' : ''} y se ${plural ? 'saltan' : 'salta'} su turno.`);
-        }
-        if (partesMensaje.length > 0) {
-            mensajeRonda.textContent = partesMensaje.join(' ');
-        }
-    }
-
-    function avanzarTurno() {
-        const jugadoresSaltados = [];
-
-        for (let paso = 1; paso <= jugadores.length; paso++) {
-            const indiceCandidato = (turnoActual + paso) % jugadores.length;
-
-            if (jugadores[indiceCandidato].bloqueado) {
-                // El bloqueo persiste: se salta su turno pero sigue bloqueado hasta que se le desbloquee manualmente
-                jugadoresSaltados.push(jugadores[indiceCandidato].nombre);
-                continue;
-            }
-
-            turnoActual = indiceCandidato;
-            return jugadoresSaltados;
-        }
-
-        // Seguridad: si todos estuvieran bloqueados, se avanza igualmente al siguiente
-        turnoActual = (turnoActual + 1) % jugadores.length;
-        return jugadoresSaltados;
+        comprobarGanador();
     }
 
     btnCerrarFlipSeven.addEventListener('click', () => {
         modalFlipSeven.classList.add('oculto');
-        continuarTrasRonda(jugadores[turnoActual]);
+        comprobarGanador();
     });
 
-    function mostrarGanador(jugador) {
+    /* ---------- Final de partida ---------- */
+
+    function comprobarGanador() {
+        const candidatos = jugadores.filter((j) => j.total >= META_PUNTOS);
+        if (candidatos.length === 0) {
+            return;
+        }
+        const ganador = candidatos.reduce((mejor, j) => (j.total > mejor.total ? j : mejor));
         seccionPartida.classList.add('oculto');
         seccionGanador.classList.remove('oculto');
-        mensajeGanador.textContent = `${jugador.nombre} ha ganado con ${jugador.total} puntos.`;
+        mensajeGanador.textContent = `${ganador.nombre} ha ganado con ${ganador.total} puntos.`;
     }
 
     function reiniciarPartida() {
         jugadores = [];
-        turnoActual = 0;
-        numerosRonda = [];
-        comodinesRonda = [];
-        renderListaJugadores();
+        contenedorPaneles.innerHTML = '';
         cuerpoMarcador.innerHTML = '';
-        listaNumerosRonda.innerHTML = '';
-        listaComodinesRonda.innerHTML = '';
-        contenedorBotonesBloqueo.innerHTML = '';
-        valorSubtotalNumeros.textContent = '0';
-        valorSubtotal.textContent = '0';
+        renderListaJugadores();
         seccionPartida.classList.add('oculto');
         seccionGanador.classList.add('oculto');
         modalFlipSeven.classList.add('oculto');

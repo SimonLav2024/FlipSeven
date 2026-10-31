@@ -33,70 +33,27 @@
             <p id="mensaje-jugadores" class="mensaje"></p>
         </section>
 
-        <!-- Paso 2: jugar rondas, uno a uno -->
-        <section id="seccion-partida" class="tarjeta oculto">
-            <h2>Partida en curso</h2>
+        <!-- Paso 2: todos los jugadores a la vez, cada uno con su panel -->
+        <section id="seccion-partida" class="oculto">
+            <h2 class="titulo-partida">Partida en curso</h2>
+            <br>
 
-            <div class="turno-actual">
-                <p>Turno de:</p>
-                <p id="nombre-turno" class="nombre-turno"></p>
+            <div id="contenedor-paneles" class="contenedor-paneles"></div>
+
+            <div class="tarjeta">
+                <h3>Marcador</h3>
+                <table id="tabla-marcador" class="tabla-marcador">
+                    <thead>
+                        <tr>
+                            <th>Jugador</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-marcador"></tbody>
+                </table>
+
+                <button id="btn-reiniciar" type="button" class="btn-secundario">Reiniciar partida</button>
             </div>
-
-            <form id="form-numero" autocomplete="off">
-                <label for="input-numero">Número sacado</label>
-                <input type="number" id="input-numero" class="input-numero-solo" name="numero" placeholder="Ej. 12" min="0" max="12" required>
-                <div class="teclado-numerico">
-                    <button type="button" class="btn-tecla" data-digito="7">7</button>
-                    <button type="button" class="btn-tecla" data-digito="8">8</button>
-                    <button type="button" class="btn-tecla" data-digito="9">9</button>
-                    <button type="button" class="btn-tecla" data-digito="4">4</button>
-                    <button type="button" class="btn-tecla" data-digito="5">5</button>
-                    <button type="button" class="btn-tecla" data-digito="6">6</button>
-                    <button type="button" class="btn-tecla" data-digito="1">1</button>
-                    <button type="button" class="btn-tecla" data-digito="2">2</button>
-                    <button type="button" class="btn-tecla" data-digito="3">3</button>
-                    <button type="button" id="btn-borrar-digito" class="btn-tecla btn-tecla-accion">⌫</button>
-                    <button type="button" class="btn-tecla" data-digito="0">0</button>
-                    <button type="button" id="btn-limpiar-digitos" class="btn-tecla btn-tecla-accion">C</button>
-                </div>
-                <button type="submit" class="btn-sacar-numero">Sacar número</button>
-            </form>
-            <p id="mensaje-ronda" class="mensaje"></p>
-
-            <ul id="lista-numeros-ronda" class="lista-numeros-ronda"></ul>
-            <p class="subtotal-numeros">Suma de puntos: <strong id="valor-subtotal-numeros">0</strong></p>
-
-            <h3>Cartas comodín <span class="nota-comodin">(no cuentan para los 7 números)</span></h3>
-            <div class="comodines-botones">
-                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="2">+2</button>
-                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="4">+4</button>
-                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="6">+6</button>
-                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="8">+8</button>
-                <button type="button" class="btn-comodin" data-tipo="bonus" data-valor="10">+10</button>
-                <button type="button" class="btn-comodin" data-tipo="multiplicador" data-valor="2">x2</button>
-            </div>
-            <ul id="lista-comodines-ronda" class="lista-numeros-ronda lista-comodines"></ul>
-
-            <p class="subtotal-ronda">Total de la ronda: <strong id="valor-subtotal">0</strong></p>
-
-            <button id="btn-plantarse" type="button" disabled>Me planto</button>
-            <button id="btn-repetido" type="button" class="btn-repetido">❌ Número repetido</button>
-
-            <h3>Carta de Bloqueo <span class="nota-comodin">(el jugador bloqueado se salta su turno hasta que se le desbloquee)</span></h3>
-            <div id="botones-bloqueo" class="comodines-botones"></div>
-
-            <h3>Marcador</h3>
-            <table id="tabla-marcador" class="tabla-marcador">
-                <thead>
-                    <tr>
-                        <th>Jugador</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="cuerpo-marcador"></tbody>
-            </table>
-
-            <button id="btn-reiniciar" type="button" class="btn-secundario">Reiniciar partida</button>
         </section>
 
         <!-- Paso 3: ganador -->
@@ -118,7 +75,7 @@
 
     <footer>
         <p>&copy; 2026 Flip 7 Seven. Todos los derechos reservados.</p>
-        <p>v1.0</p>
+        <p>v2.0</p>
         <p>Favicon <a target="_blank" href="https://icons8.com/icon/DorLgnWgwwF1/7-key">7 clave</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a></p>
     </footer>
 

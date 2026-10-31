@@ -6,8 +6,8 @@ body {
     margin: 0;
     min-height: 100vh;
     font-family: "Segoe UI", Arial, sans-serif;
-    background: linear-gradient(160deg, #1b1230, #3a0d0d 70%);
-    color: #f5f0ff;
+    background: linear-gradient(160deg, #162d96f5, #2a9cfa 70%);
+    color: #fcd80b;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,12 +30,21 @@ header h1 {
     font-size: 0.95rem;
 }
 
+/* Ancho amplio para que quepan varios jugadores a la vez */
 main {
     width: 100%;
-    max-width: 480px;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+/* Las pantallas de alta y de ganador se mantienen estrechas y centradas */
+#seccion-jugadores,
+#seccion-ganador {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
 }
 
 .tarjeta {
@@ -88,8 +97,8 @@ button {
     padding: 10px 16px;
     font-size: 0.95rem;
     font-weight: 600;
-    background: #e63946;
-    color: #fff;
+    background: #0c1cb3;
+    color: #ecff44;
     transition: transform 0.1s ease, opacity 0.2s ease;
 }
 
@@ -157,22 +166,68 @@ button:disabled {
     color: #ffb4b4;
 }
 
-.turno-actual {
+/* ---------- Partida: paneles simultáneos ---------- */
+
+.titulo-partida {
     text-align: center;
-    margin-bottom: 16px;
-}
-
-.turno-actual p:first-child {
     margin: 0;
-    color: #d8c7ff;
-    font-size: 0.9rem;
 }
 
-.nombre-turno {
-    margin: 4px 0 0 !important;
-    font-size: 1.6rem;
-    font-weight: 700;
+/* Jugadores uno al lado del otro; en pantallas estrechas se apilan solos */
+.contenedor-paneles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+.panel-jugador {
+    margin: 0;
+}
+
+.panel-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.panel-nombre {
+    margin: 0;
+    font-size: 1.4rem;
     color: #ffd166;
+    overflow-wrap: anywhere;
+}
+
+.panel-total {
+    font-weight: 700;
+    white-space: nowrap;
+    color: #fff;
+}
+
+.panel-etiqueta {
+    margin: 14px 0 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #d8c7ff;
+}
+
+.panel-teclado {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.panel-teclado .btn-tecla {
+    padding: 9px 0;
+    font-size: 1rem;
+    min-width: 0;
+}
+
+.panel-teclado .btn-tecla:disabled {
+    opacity: 0.3;
 }
 
 .lista-numeros-ronda {
@@ -201,22 +256,6 @@ button:disabled {
     font-size: 0.85rem;
 }
 
-.teclado-numerico {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 12px;
-}
-
-.input-numero-solo {
-    width: 100%;
-}
-
-.btn-sacar-numero {
-    width: 100%;
-    margin-top: 12px;
-}
-
 .btn-tecla {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -225,17 +264,8 @@ button:disabled {
     border-radius: 8px;
 }
 
-.btn-tecla:hover {
+.btn-tecla:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.16);
-}
-
-.btn-tecla-accion {
-    background: rgba(230, 57, 70, 0.3);
-    font-size: 1rem;
-}
-
-.btn-tecla-accion:hover {
-    background: rgba(230, 57, 70, 0.5);
 }
 
 .subtotal-numeros {
@@ -246,12 +276,6 @@ button:disabled {
 
 .subtotal-numeros strong {
     color: #ffd166;
-}
-
-.nota-comodin {
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: #b9a8dd;
 }
 
 .comodines-botones {
@@ -272,36 +296,6 @@ button:disabled {
     background: #7c4fd0;
 }
 
-.lista-comodines li {
-    background: rgba(106, 63, 181, 0.35);
-    border: 1px solid rgba(124, 79, 208, 0.6);
-}
-
-.btn-bloqueo {
-    background: #1d6fa5;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 0.9rem;
-}
-
-.btn-bloqueo:hover:not(:disabled) {
-    background: #2688c4;
-}
-
-.btn-desbloqueo {
-    background: #2a9d57;
-}
-
-.btn-desbloqueo:hover:not(:disabled) {
-    background: #34bd69;
-}
-
-.etiqueta-bloqueado {
-    color: #7ecbff;
-    font-size: 0.85rem;
-    font-weight: 700;
-}
-
 .subtotal-ronda {
     margin: 12px 0 0;
     font-size: 0.95rem;
@@ -312,10 +306,9 @@ button:disabled {
     color: #ffd166;
 }
 
-#btn-plantarse {
+.btn-plantarse {
     width: 100%;
     margin-top: 12px;
-    margin-bottom: 8px;
 }
 
 .tabla-marcador {
